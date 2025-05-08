@@ -2,32 +2,86 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Descargar Imágenes</title>
+  <title>🤫</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; }
-    input { width: calc(100% - 22px); padding: 10px; }
-    button { margin-top: 10px; padding: 10px 20px; }
-    img { max-width: 100%; margin-top: 1rem; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      color: #212529;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      max-width: 600px;
+      padding: 2rem;
+      background-color: #ffffff;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+    }
+    .form-control {
+      border-radius: 0.5rem;
+    }
+    .btn {
+      border-radius: 0.5rem;
+    }
+    #preview {
+      max-width: 100%;
+      margin-top: 1rem;
+      border-radius: 0.5rem;
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <h1>Descargar Imagen de Cualquier URL</h1>
-  <input id="url" type="text" placeholder="Pega aquí la URL de la imagen">
-  <br>
-  <button id="view">Previsualizar</button>
-  <button id="download">Descargar</button>
-  <div><img id="preview" alt="Previsualización"></div>
+  <div class="container text-center">
+    <h1 class="mb-4">Descargar Imagen</h1>
+    <div class="mb-3">
+      <input id="url" type="text" class="form-control" placeholder="Pega aquí la URL de la imagen">
+    </div>
+    <div class="d-flex justify-content-center gap-2 mb-3">
+      <button id="view" class="btn btn-outline-primary">
+        <i class="bi bi-eye"></i> Previsualizar
+      </button>
+      <button id="download" class="btn btn-primary">
+        <i class="bi bi-download"></i> Descargar
+      </button>
+    </div>
+    <img id="preview" alt="Previsualización de la imagen">
+  </div>
 
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const preview = document.getElementById('preview');
-    document.getElementById('view').onclick = () => {
-      const url = document.getElementById('url').value;
+    const urlInput = document.getElementById('url');
+    const viewBtn = document.getElementById('view');
+    const downloadBtn = document.getElementById('download');
+
+    viewBtn.onclick = () => {
+      const url = urlInput.value.trim();
+      if (!url) {
+        alert('Por favor, ingresa una URL válida.');
+        return;
+      }
       preview.src = url;
+      preview.style.display = 'block';
     };
 
-    document.getElementById('download').onclick = async () => {
-      const rawUrl = document.getElementById('url').value;
-      if (!rawUrl) return alert('Pon la URL primero');
+    downloadBtn.onclick = async () => {
+      const rawUrl = urlInput.value.trim();
+      if (!rawUrl) {
+        alert('Por favor, ingresa una URL válida.');
+        return;
+      }
       const proxyUrl = `/proxy?url=${encodeURIComponent(rawUrl)}`;
       try {
         const res = await fetch(proxyUrl, { mode: 'cors' });
@@ -35,11 +89,13 @@
         const blob = await res.blob();
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = rawUrl.split('/').pop();
+        link.download = rawUrl.split('/').pop() || 'imagen.jpg';
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
         URL.revokeObjectURL(link.href);
       } catch (e) {
-        alert('No se pudo descargar: ' + e.message);
+        alert('No se pudo descargar la imagen: ' + e.message);
       }
     };
   </script>
