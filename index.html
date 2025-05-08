@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Descargar Imágenes</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; }
+    input { width: calc(100% - 22px); padding: 10px; }
+    button { margin-top: 10px; padding: 10px 20px; }
+    img { max-width: 100%; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Descargar Imagen de Cualquier URL</h1>
+  <input id="url" type="text" placeholder="Pega aquí la URL de la imagen">
+  <br>
+  <button id="view">Previsualizar</button>
+  <button id="download">Descargar</button>
+  <div><img id="preview" alt="Previsualización"></div>
+
+  <script>
+    const preview = document.getElementById('preview');
+    document.getElementById('view').onclick = () => {
+      const url = document.getElementById('url').value;
+      preview.src = url;
+    };
+
+    document.getElementById('download').onclick = async () => {
+      const rawUrl = document.getElementById('url').value;
+      if (!rawUrl) return alert('Pon la URL primero');
+      const proxyUrl = `/proxy?url=${encodeURIComponent(rawUrl)}`;
+      try {
+        const res = await fetch(proxyUrl, { mode: 'cors' });
+        if (!res.ok) throw new Error('Error en la respuesta del proxy');
+        const blob = await res.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = rawUrl.split('/').pop();
+        link.click();
+        URL.revokeObjectURL(link.href);
+      } catch (e) {
+        alert('No se pudo descargar: ' + e.message);
+      }
+    };
+  </script>
+</body>
+</html>
