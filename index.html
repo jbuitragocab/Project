@@ -99,5 +99,23 @@
       }
     };
   </script>
+
+  <script>
+    // CORS proxy server URL
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    // Set the proxy URL for fetch requests
+    window.fetch = (url, options) => {
+      if (options && options.mode === 'cors') {
+        options.headers = {
+          ...options.headers,
+          'X-Requested-With': 'XMLHttpRequest'
+        };
+        url = proxyUrl + url;
+      }
+      return originalFetch(url, options);
+    };
+    const originalFetch = window.fetch;
+    window.fetch = originalFetch;
+  </script>
 </body>
 </html>
